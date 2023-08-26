@@ -20,7 +20,20 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
+  
+  the-gamers-network-OAuth2.0:
+    image: keycloak/keycloak:latest
+    container_name: tgn-development-oauth2
+    ports:
+      - "8080:8080"
+    env_file:
+      - "./development.env"
+    command: "start-dev"
+    volumes:
+      - oauth2:/var/lib/oauth2
 
 volumes:
   database:
+    driver: local
+  oauth2:
     driver: local
