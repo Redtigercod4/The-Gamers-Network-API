@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace TheGamersNetworkApiTests;
+namespace Service.Tests;
 
 public class UnitTest1
 {

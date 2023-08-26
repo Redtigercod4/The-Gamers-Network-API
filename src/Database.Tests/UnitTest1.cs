@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace TheGamersNetworkServiceTests;
+namespace Database.Tests;
 
 public class UnitTest1
 {
