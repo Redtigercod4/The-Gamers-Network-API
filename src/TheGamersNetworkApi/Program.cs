@@ -1,6 +1,6 @@
 namespace TheGamersNetworkApi
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {
@@ -14,19 +14,19 @@ namespace TheGamersNetworkApi
             }
             catch (Exception ex)
             {
+                Console.Write(ex);
                 return 1;
             }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return CreateHostBuilder.CreateDefaultBuilder(args)
+            return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
-                webBuilder.ConfigureKestrel((context, options) =>
-                {
-                    options.Limits.MaxRequestBodySize = 53000;
-                }))
-            .UseStartup<Startup>();
+            webBuilder.ConfigureKestrel((options) =>
+            options.Limits.MaxRequestBodySize = 53000
+            )
+            .UseStartup<Startup>());
         }
     }
 }

@@ -1,14 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
-using System;
-using System.Collections.Generic;
-
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace TheGamersNetworkApi
 {
@@ -21,27 +11,52 @@ namespace TheGamersNetworkApi
             Configuration = configuration;
         }
 
-        private void ConfigureCommonServies(IServiceCollection services)
+        private static void ConfigureCommonServies(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
             services.AddHttpClient();
             services.AddControllers();
-            services.AddSwaggerGen();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            ConfigureCommonServies(services);
+            Database.ServicesConfiguration.ConfigureDevelopmentServices(services);
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    "development",
+                    policyBuilder =>
+                        policyBuilder.RequireAssertion(context => true)
+                );
+            });
+        }
+
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            ConfigureCommonServies(services);
+            Database.ServicesConfiguration.ConfigureProductionServices(services);
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Administrator", policy => policy.RequireClaim("user_roles", "[Administrator]"));
+                options.AddPolicy("ArenaManager", policy => policy.RequireClaim("user_roles", "[ArenaManager]"));
+                options.AddPolicy("Gamer", policy => policy.RequireClaim("user_roles", "[Gamer]"));
+            });
+        }
+
+        public void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
-            app.UseCors(builder => builder.WithOrigins(Configuration["Cors"].Split(" ")).AllowAnyHeader().AllowAnyMethod().AllowCredentials());
+            app.UseCors(builder =>
+            builder.WithOrigins(Configuration["Cors"].Split(" "))
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            if (Configuration["Swagger"] == "Enabled")
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                endpoints.MapControllers()
+            );
         }
     }
+}
