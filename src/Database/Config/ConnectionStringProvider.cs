@@ -4,16 +4,17 @@ namespace Database.Config
 {
     public class ConnectionStringProvider : IConnectionStringProvider
     {
-        private string _connectionString;
+        private readonly string _connectionString;
 
         public ConnectionStringProvider()
         {
-            var connectionString = new NpgsqlConnectionStringBuilder();
-            connectionString.Host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
-            connectionString.Port = 5432;
-            connectionString.Username = Environment.GetEnvironmentVariable("POSTGRES_USER");
-            connectionString.Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
-            connectionString.Database = Environment.GetEnvironmentVariable("POSTGRES_DB");
+            var connectionString = new NpgsqlConnectionStringBuilder() {
+                Host = Environment.GetEnvironmentVariable("POSTGRES_HOST"),
+                Port = 5432,
+                Username = Environment.GetEnvironmentVariable("POSTGRES_USER"),
+                Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD"),
+                Database = Environment.GetEnvironmentVariable("POSTGRES_DB")
+             };
             _connectionString = connectionString.ConnectionString;
         }
 
@@ -23,6 +24,7 @@ namespace Database.Config
             {
                 return _connectionString;
             }
+            private set { }
         }
     }
 }
